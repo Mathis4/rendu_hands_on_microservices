@@ -2,12 +2,12 @@
 FROM python:3.11-slim
 
 # Install FastAPI and Uvicorn
-RUN pip install fastapi uvicorn asyncpg 
+RUN pip install fastapi uvicorn asyncpg requests_unixsocket
 # Copy the application code
-COPY main.py /app/main.py
+COPY user_admin_api.py /app/user_admin_api.py
 # Set the working directory to /app
 WORKDIR /app
 # Expose UDS path as a volume
 VOLUME ["/tmp"]
 # Run Uvicorn using the Unix Domain Socket
-CMD ["uvicorn", "main:app", "--uds", "/tmp/service_b.sock"]
+CMD ["uvicorn", "user_admin_api:app", "--uds", "/tmp/api_socket.sock"]

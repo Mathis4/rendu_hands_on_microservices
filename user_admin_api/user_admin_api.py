@@ -40,8 +40,20 @@ async def shutdown():
     # Fermeture de la connexion à la base de données
     await app.state.db.close()
 
-@app.get("/get-data")
-async def get_data():
-    # Récupération des données de la table
+# Récupérer tous les utilisateurs (admin only)
+@app.get("/admin/users")
+async def get_all_users():
     result = await app.state.db.fetch("SELECT * FROM my_table;")
-    return [dict(record) for record in result]  # Convertir les résultats en dictionnaire
+    return [dict(record) for record in result]
+
+# Supprimer un utilisateur (admin only)
+@app.delete("/admin/users/delete")
+async def delete_user(user_id: int):
+    await app.state.db.execute("DELETE FROM my_table WHERE id=$1;", user_id)
+    return {"message": "Utilisateur supprimé avec succès"}
+
+# Envoyer (ajouter) une donnée
+@app.post("/users/send")
+async def send_data(name: str):
+    await app.state.db.execute("INSERT INTO my_table (name) VALUES ($1);", name)
+    return {"message": "Donnée envoyée avec succès"}

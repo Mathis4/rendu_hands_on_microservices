@@ -9,7 +9,7 @@ async def call_service_b():
     # Use a custom transport to make requests via the UDS
     transport = httpx.AsyncHTTPTransport(uds=uds_path)
     # Standard URL format without http+unix://
-    url = "http://service_b/data"
+    url = "http://service_b/get-data"
     async with httpx.AsyncClient(transport=transport) as client:
         response = await client.get(url)
     return response.json()

@@ -5,6 +5,7 @@ services:
     volumes:
       - /tmp:/tmp  # Share /tmp for the Unix Domain Socket
     restart: always
+
   service_a:
     build:
       context: ./service_a
@@ -14,4 +15,46 @@ services:
       - "8000:8000"  # Expose service_a's port to access it from outside
     depends_on:
       - service_b
+      - db  # Nouvelle dépendance
     restart: always
+
+
+  user_admin_api:
+    build:
+      context: ./user_admin_api
+    volumes:
+      - /tmp:/tmp  # Share /tmp for the Unix Domain Socket
+    depends_on:
+      - db 
+    restart: always
+
+  user_ui:
+    build: ./user_ui
+    volumes:
+       - /tmp:/tmp  # Partage du dossier /tmp
+    ports:
+      - "7860:7860"
+    depends_on:
+      - user_admin_api
+
+  admin_ui:
+    build: ./admin_ui
+    volumes:
+       - /tmp:/tmp  # Partage du dossier /tmp
+    ports:
+      - "7861:7861"
+    depends_on:
+      - user_admin_api
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  db_data:  # Volume pour stocker les données de la base
